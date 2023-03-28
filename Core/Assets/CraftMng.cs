@@ -11,15 +11,28 @@ public class CraftMng : MonoBehaviour, ICraftMng
 {
     public float condition = 100;
     public Rigidbody Body;
+    public Transform CameraRoot;
+    [Header("Limits")]
     public float MaxForwardSpeed;
     public float MaxBackwardSpeed;
     public float MaxSideSpeed;
     public float MaxRotareSpeed;
+    [Header("Forse Scale")]
+    public float ForwardSpeedScale = 1;
+    public float BackwardSpeedScale = 1;
+    public float SideSpeedScale = 1;
+    public float RotareSpeedScale = 1;
+    [Header("Drag Settings")]
+    public float PasiveDrag = 0.02f;
+    public float BrakeDragScale = 1;
+
+    public float PasiveAngularDrag = 0.02f;
+    public float BrakeAngularDragScale = 1;
 
     private Vector3 CurrForse;
     private Vector3 CurrTorque;
-    private float CurrDrag = 0.05f;
-
+    private float CurrDrag;
+    private float CurrAngularDrag ;
     private List<ISystemMng> Systems;
     private List<ITrusterMng> Trusters;
     private List<IWeaponMng> Weapons;
@@ -31,9 +44,9 @@ public class CraftMng : MonoBehaviour, ICraftMng
 
     public float Condition => throw new System.NotImplementedException();
 
-    public void AddSpeed(InputAction.CallbackContext context)
+    public void Move(InputAction.CallbackContext context)
     {
-        if (activity & context.started)
+        if (activity & context.performed)
         {
             float forse = 0;
             Trusters.ForEach(traster => forse += traster.Forse);
@@ -41,37 +54,37 @@ public class CraftMng : MonoBehaviour, ICraftMng
             Vector2 direction = context.ReadValue<Vector2>();
             if (Vector2.up == direction)
             {
-                CurrForse = Vector3.forward * forse;
+                CurrForse = Vector3.forward * forse * ForwardSpeedScale;
             }
             if ((Vector2.up + Vector2.right) == direction)
             {
-                CurrForse = Vector3.right * (forse / 1.8f) + Vector3.forward * forse;
+                CurrForse = (Vector3.right * forse * SideSpeedScale) + (Vector3.forward * forse * ForwardSpeedScale);
             }
             if ((Vector2.up + Vector2.left) == direction)
             {
-                CurrForse = -Vector3.right * (forse / 1.8f) + Vector3.forward * forse;
+                CurrForse = -(Vector3.right * forse * SideSpeedScale) + (Vector3.forward * forse * ForwardSpeedScale);
             }
 
             if (Vector2.down == direction)
             {
-                CurrForse = -Vector3.forward * (forse/1.5f);
+                CurrForse = -(Vector3.forward * forse * BackwardSpeedScale);
             }
             if ((Vector2.down + Vector2.right) == direction)
             {
-                CurrForse = Vector3.right * (forse / 1.8f) + Vector3.forward * (forse / 1.5f);
+                CurrForse = (Vector3.right * forse * SideSpeedScale) - (Vector3.forward * forse * BackwardSpeedScale);
             }
             if ((Vector2.down + Vector2.left) == direction)
             {
-                CurrForse = -Vector3.right * (forse / 1.8f) + Vector3.forward * (forse / 1.5f);
+                CurrForse = -(Vector3.right * forse * SideSpeedScale) - (Vector3.forward * forse * BackwardSpeedScale);
             }
 
             if (Vector2.right == direction)
             {
-                CurrForse = Vector3.right * (forse / 1.8f);
+                CurrForse = Vector3.right * forse * SideSpeedScale;
             }
             if (Vector2.left == direction)
             {
-                CurrForse = -Vector3.right * (forse / 1.8f);
+                CurrForse = -Vector3.right * forse * SideSpeedScale;
             }
         }
 
@@ -91,7 +104,7 @@ public class CraftMng : MonoBehaviour, ICraftMng
         {
             float direction = context.ReadValue<float>();
 
-            CurrTorque.y = direction * (forse / 4);
+            CurrTorque.y = direction * forse * RotareSpeedScale;
         }
 
         if (context.canceled)
@@ -104,7 +117,7 @@ public class CraftMng : MonoBehaviour, ICraftMng
     {
         Vector3 newVelocity = Vector3.zero;
 
-        newVelocity.y = Mathf.Clamp(Body.angularVelocity.y, -MaxRotareSpeed, MaxRotareSpeed);
+        newVelocity.y = Mathf.Clamp(Body.angularVelocity.y, - MaxRotareSpeed, MaxRotareSpeed);
 
         Body.angularVelocity = newVelocity;
     }
@@ -130,18 +143,15 @@ public class CraftMng : MonoBehaviour, ICraftMng
 
         if (activity & context.started)
         {
-            CurrDrag = forse;
+            CurrDrag = forse * BrakeDragScale;
+            CurrAngularDrag = forse * BrakeAngularDragScale;
         }
 
         if (context.canceled)
         {
-            CurrDrag = 0.2f;
+            CurrDrag = PasiveDrag;
+            CurrAngularDrag = PasiveAngularDrag;
         }
-    }
-
-    public void CaptureMainCamera()
-    {
-        throw new System.NotImplementedException();
     }
 
     public void CaptureMovement(Transform target)
@@ -214,11 +224,21 @@ public class CraftMng : MonoBehaviour, ICraftMng
         throw new System.NotImplementedException();
     }
 
+    public Transform GetCameraRoot()
+    {
+        if (CameraRoot == null)
+            throw new System.NotImplementedException("” корабл€ не указано посадочное место дл€ камеры");
+        return CameraRoot;
+    }
+
     void Start()
     {
         Systems  = transform.GetComponentsInChildren<ISystemMng>().ToList();
         Trusters = transform.GetComponentsInChildren<ITrusterMng>().ToList();
         Weapons  = transform.GetComponentsInChildren<IWeaponMng>().ToList();
+
+        Body.drag = PasiveDrag;
+        Body.angularDrag = PasiveAngularDrag;
     }
 
     // Update is called once per frame
@@ -227,7 +247,7 @@ public class CraftMng : MonoBehaviour, ICraftMng
         Body.AddRelativeForce(CurrForse, ForceMode.Force);
         Body.AddRelativeTorque(CurrTorque, ForceMode.Force);
         Body.drag = CurrDrag;
-        Body.angularDrag = CurrDrag;
+        Body.angularDrag = CurrAngularDrag;
         ClampVelosity();
         ClampTorque();
     }

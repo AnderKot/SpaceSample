@@ -5,7 +5,7 @@ using UnityEngine.InputSystem;
 
 namespace SampleSpace
 {
-    interface ISystemMng
+    public interface ISystemMng
     {
         void Off();
         void On();
@@ -16,14 +16,14 @@ namespace SampleSpace
         void Repear(float poin);
     }
 
-    interface ITrusterMng : ISystemMng
+    public interface ITrusterMng : ISystemMng
     {
         float Forse { get; }
         void StartBlink();
         void StopBlink();
     }
 
-    interface IWeaponMng : ISystemMng
+    public interface IWeaponMng : ISystemMng
     {
         void Fire();
         void HoldFire();
@@ -51,20 +51,22 @@ namespace SampleSpace
         EMP = 5
     }
 
-    interface ICraftMng : ISystemMng
+    public interface ICraftMng : ISystemMng
     {
-
         void OffTrusters();
         void OnTrusters();
         bool TrustersActivity { get; set; }
-        void AddSpeed(InputAction.CallbackContext context);
+        void Move(InputAction.CallbackContext context);
         void Rotare(InputAction.CallbackContext context);
         void Brake(InputAction.CallbackContext context);
         void CaptureMovement(Transform target);
-
-        void CaptureMainCamera();
-
         void Fire(InputAction.CallbackContext context);
+        Transform GetCameraRoot();
+    }
+
+    public interface ICameraMng
+    {
+
     }
 }
 

@@ -6,13 +6,13 @@ using UnityEngine.UIElements;
 
 public class EnergyWeaponMng : MonoBehaviour, IWeaponMng
 {
-    public Renderer WeaponEffector;
+    public LineRenderer WeaponEffector;
     public float condition = 100;
     public float Length = 50;
     public Damage DamageParam = new Damage(10, DamageType.Energy);
 
     private bool activity = true;
-
+    
     public bool Activity
     {
         get => WeaponEffector.enabled;
@@ -81,6 +81,7 @@ public class EnergyWeaponMng : MonoBehaviour, IWeaponMng
     void Start()
     {
         StopFire();
+
     }
 
     // Update is called once per frame
@@ -91,8 +92,28 @@ public class EnergyWeaponMng : MonoBehaviour, IWeaponMng
             RaycastHit hit;
             if(Physics.Raycast(transform.position, transform.forward, out hit, Length))
             {
-                hit.transform.GetComponent<ISystemMng>().Damage(DamageParam);
+                WeaponEffector.SetPosition(1, Vector3.forward * Vector3.Distance(transform.position, hit.point));
+
+                ISystemMng sys = hit.collider.transform.GetComponent<ISystemMng>();
+                if (sys != null)
+                {
+                    sys.Damage(DamageParam);
+                    Debug.Log("Hit&Damage_" + hit.collider.transform.name);
+
+                }
+
+                sys = hit.collider.transform.parent.GetComponent<ISystemMng>();
+                if (sys != null)
+                {
+                    sys.Damage(DamageParam);
+                    Debug.Log("Hit&Damage_Parent_" + hit.collider.transform.name);
+
+                }
+
+                Debug.Log("Hit_" + hit.collider.transform.name);
             }
+            else
+            WeaponEffector.SetPosition(1, Vector3.forward * Length);
         }
     }
 }
