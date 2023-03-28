@@ -53,7 +53,7 @@ namespace SampleSpace
     {
         Off = 0,
         On = 1,
-        Alert = 3
+        Broke = 3
     }
 
     public interface ICraftMng : ISystemMng

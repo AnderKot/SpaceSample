@@ -5,7 +5,9 @@ using UnityEngine;
 
 public class SystemMng : MonoBehaviour, ISystemMng
 {
-    public float condition = 100;
+    protected float condition = 100;
+    public float BrokeLine = 10;
+    public float MaxCondition = 100;
     protected Statuses status = Statuses.On;
 
     public float Condition => condition;
@@ -20,26 +22,39 @@ public class SystemMng : MonoBehaviour, ISystemMng
 
     public void Damage(Damage D)
     {
-        condition -= D.Points;
-        if (condition < 0)
+        if (Status != Statuses.Broke)
         {
-            condition = 0;
-            status = Statuses.Alert;
+            condition -= D.Points;
+            if (condition < BrokeLine)
+            {
+                status = Statuses.Broke;
+            }
+            if (condition < 0)
+                condition = 0;
         }
+
     }
 
     public void Off()
     {
-        status = Statuses.Off;
+        if (Status != Statuses.Broke)
+            status = Statuses.Off;
     }
 
     public void On()
     {
-        status = Statuses.On;
+        if(Status != Statuses.Broke)
+            status = Statuses.On;
     }
 
     public void Repear(float points)
     {
         condition += points;
+
+        if (condition > BrokeLine)
+            status = Statuses.Off;
+
+        if(condition > MaxCondition)
+            condition = MaxCondition;
     }
 }

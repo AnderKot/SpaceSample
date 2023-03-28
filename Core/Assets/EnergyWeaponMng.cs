@@ -27,7 +27,7 @@ public class EnergyWeaponMng : SystemMng, IWeaponMng
     new public void Damage(Damage D)
     {
         base.Damage(D);
-        if (status == Statuses.Alert)
+        if (status == Statuses.Broke)
             HoldFire();
     }
 

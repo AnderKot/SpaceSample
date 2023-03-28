@@ -158,7 +158,7 @@ public class CraftMng : SystemMng, ICraftMng
     new public void Damage(Damage d)
     {
         base.Damage(d);
-        if (status == Statuses.Alert)
+        if (status == Statuses.Broke)
         { 
             HoldFire();
             OffTrusters();
@@ -224,8 +224,8 @@ public class CraftMng : SystemMng, ICraftMng
 
             foreach(ITrusterMng truster in Trusters)
             {
-                if (truster.Status == Statuses.Alert)
-                    return Statuses.Alert;
+                if (truster.Status == Statuses.Broke)
+                    return Statuses.Broke;
                 if (truster.Status == Statuses.Off)
                     IsOff = true;
             }

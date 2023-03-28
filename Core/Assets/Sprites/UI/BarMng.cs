@@ -37,7 +37,7 @@ public class BarMng : MonoBehaviour
 
     private void UpdateStatus(Statuses value)
     {
-        if ((value < Statuses.Off)| (value > Statuses.Alert))
+        if ((value < Statuses.Off)| (value > Statuses.Broke))
         {
             throw new ArgumentException(gameObject.name +" Статус Бар получил не верный статус");
         }
