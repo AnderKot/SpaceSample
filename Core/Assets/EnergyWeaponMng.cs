@@ -4,10 +4,9 @@ using UnityEngine;
 using SampleSpace;
 using UnityEngine.UIElements;
 
-public class EnergyWeaponMng : MonoBehaviour, IWeaponMng
+public class EnergyWeaponMng : SystemMng, IWeaponMng
 {
     public LineRenderer WeaponEffector;
-    public float condition = 100;
     public float Length = 50;
     public Damage DamageParam = new Damage(10, DamageType.Energy);
 
@@ -19,69 +18,46 @@ public class EnergyWeaponMng : MonoBehaviour, IWeaponMng
         set
         {
             if (value)
-                StartFire();
+                Fire();
             else
-                StopFire();
+                HoldFire();
         }
     }
 
-    public float Condition => condition;
-
-    public void Damage(Damage D)
+    new public void Damage(Damage D)
     {
-        if (activity)
-        {
-            condition -= D.Points;
-            if (condition < 0)
-            {
-                activity = false;
-                StopFire();
-                condition = 0;
-            }
-        }   
+        base.Damage(D);
+        if (status == Statuses.Alert)
+            HoldFire();
     }
 
-    public void Off()
+    new public void Off()
     {
-        StopFire();
+        base.Off();
+        Fire();
     }
 
-    public void On()
+    new public void On()
     {
-        StartFire();
+        base.On();
+        HoldFire();
     }
-
-    public void Repear(float points)
-    {
-        condition += points;
-    }
-
 
     public void Fire()
     {
-        StartFire();
-    }
 
-    public void HoldFire()
-    {
-        StopFire();
-    }
-
-    private void StartFire()
-    {
-        if(activity)
+        if (activity)
             WeaponEffector.enabled = true;
     }
 
-    private void StopFire()
+    public void HoldFire()
     {
         WeaponEffector.enabled = false;
     }
 
     void Start()
     {
-        StopFire();
-
+        HoldFire();
     }
 
     // Update is called once per frame

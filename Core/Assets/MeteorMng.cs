@@ -11,9 +11,9 @@ public class MeteorMng : MonoBehaviour, ISystemMng
     public float GrowthSpeed = 0.005f;
     public float DamageResist = 20;
 
-    public bool Activity { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
-
     public float Condition => throw new System.NotImplementedException();
+
+    public Statuses Status => throw new System.NotImplementedException();
 
     public void Damage(Damage d)
     {

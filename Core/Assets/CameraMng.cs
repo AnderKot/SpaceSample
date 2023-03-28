@@ -5,11 +5,14 @@ using SampleSpace;
 using UnityEngine.InputSystem;
 using static UnityEngine.InputSystem.PlayerInput;
 
-public class CameraMng : MonoBehaviour
+public class CameraMng : MonoBehaviour, ICameraMng
 {
     public PlayerInput Imput;
-    private ICraftMng CurrCraftMng;
 
+    [Header("UI Elements")]
+    public BarMng Speed;
+
+    private ICraftMng CurrCraftMng;
     private ActionEvent Move;
     private ActionEvent Fire;
     private ActionEvent Rotare;
@@ -21,6 +24,12 @@ public class CameraMng : MonoBehaviour
         UpdateCurrCraftControls();
     }
 
+    void FixedUpdate()
+    {
+        Speed.Status = CurrCraftMng.TrastersStatus;
+        Speed.Value = CurrCraftMng.GetSpeed().ToString("##,00") + " lpd/c";
+    }
+
     public void SetCraft(ICraftMng craftMng)
     {
 
@@ -28,8 +37,7 @@ public class CameraMng : MonoBehaviour
     }
 
     private void UpdateCurrCraftControls()
-    {
-        
+    {        
         CurrCraftMng = GameObject.FindGameObjectWithTag("Player").GetComponent<ICraftMng>();
         transform.SetParent(CurrCraftMng.GetCameraRoot());
         transform.SetLocalPositionAndRotation(Vector3.zero, Quaternion.identity);

@@ -7,9 +7,8 @@ using UnityEditor.Experimental.GraphView;
 using UnityEngine.InputSystem;
 using Unity.VisualScripting;
 
-public class CraftMng : MonoBehaviour, ICraftMng
+public class CraftMng : SystemMng, ICraftMng
 {
-    public float condition = 100;
     public Rigidbody Body;
     public Transform CameraRoot;
     [Header("Limits")]
@@ -40,9 +39,6 @@ public class CraftMng : MonoBehaviour, ICraftMng
     private bool activity = true;
 
     public bool TrustersActivity { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
-    public bool Activity { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
-
-    public float Condition => throw new System.NotImplementedException();
 
     public void Move(InputAction.CallbackContext context)
     {
@@ -159,18 +155,13 @@ public class CraftMng : MonoBehaviour, ICraftMng
         throw new System.NotImplementedException();
     }
 
-    public void Damage(Damage d)
+    new public void Damage(Damage d)
     {
-        if (activity)
-        {
-            condition -= d.Points;
-            if (condition < 0)
-            {
-                activity = false;
-                HoldFire();
-                OffTrusters();
-                condition = 0;
-            }
+        base.Damage(d);
+        if (status == Statuses.Alert)
+        { 
+            HoldFire();
+            OffTrusters();
         }
     }
 
@@ -198,30 +189,18 @@ public class CraftMng : MonoBehaviour, ICraftMng
         Weapons.ForEach(weapon => weapon.HoldFire());
     }
 
-    public void Off()
+    new public void Off()
     {
+        base.Off();
         Systems.ForEach(system => system.Off());
     }
 
-    public void OffTrusters()
-    {
-        Trusters.ForEach(truster => truster.Off());
-    }
 
-    public void On()
+
+    new public void On()
     {
+        base.On();
         Systems.ForEach(system => system.On());
-    }
-
-    public void OnTrusters()
-    {
-        if (activity)
-            Trusters.ForEach(truster => truster.On());
-    }
-
-    public void Repear(float poin)
-    {
-        throw new System.NotImplementedException();
     }
 
     public Transform GetCameraRoot()
@@ -229,6 +208,42 @@ public class CraftMng : MonoBehaviour, ICraftMng
         if (CameraRoot == null)
             throw new System.NotImplementedException("У корабля не указано посадочное место для камеры");
         return CameraRoot;
+    }
+
+    // -- Двигатели --
+    public float GetSpeed()
+    {
+        return Body.velocity.magnitude;
+    }
+
+    public Statuses TrastersStatus
+    {
+        get
+        {
+            bool IsOff = false;
+
+            foreach(ITrusterMng truster in Trusters)
+            {
+                if (truster.Status == Statuses.Alert)
+                    return Statuses.Alert;
+                if (truster.Status == Statuses.Off)
+                    IsOff = true;
+            }
+
+            if (IsOff)
+                return Statuses.Off;
+            
+            return Statuses.On;
+        }
+    }
+    public void OnTrusters()
+    {
+        if (activity)
+            Trusters.ForEach(truster => truster.On());
+    }
+    public void OffTrusters()
+    {
+        Trusters.ForEach(truster => truster.Off());
     }
 
     void Start()

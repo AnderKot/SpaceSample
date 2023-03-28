@@ -5112,6 +5112,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Imput: {fileID: 7775764927029587348}
+  Speed: {fileID: 3172860354937511187}
 --- !u!20 &7775764927057628664
 Camera:
   m_ObjectHideFlags: 0
@@ -5366,3 +5367,14 @@ RectTransform:
   m_CorrespondingSourceObject: {fileID: 902220703556161592, guid: 0d12bc03d1950384782544be6661fddd, type: 3}
   m_PrefabInstance: {fileID: 3222835080831512217}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &3172860354937511187 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 49975831087903626, guid: 0d12bc03d1950384782544be6661fddd, type: 3}
+  m_PrefabInstance: {fileID: 3222835080831512217}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bee14f7a07c29494ab6815db75213781, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

@@ -9,8 +9,7 @@ namespace SampleSpace
     {
         void Off();
         void On();
-        bool Activity { get; set; }
-
+        Statuses Status { get; }
         float Condition { get; }
         void Damage(Damage d);
         void Repear(float poin);
@@ -50,6 +49,12 @@ namespace SampleSpace
         Presure = 4,
         EMP = 5
     }
+    public enum Statuses
+    {
+        Off = 0,
+        On = 1,
+        Alert = 3
+    }
 
     public interface ICraftMng : ISystemMng
     {
@@ -62,11 +67,13 @@ namespace SampleSpace
         void CaptureMovement(Transform target);
         void Fire(InputAction.CallbackContext context);
         Transform GetCameraRoot();
+        float GetSpeed();
+        Statuses TrastersStatus { get; }
     }
 
     public interface ICameraMng
     {
-
+        public void SetCraft(ICraftMng craftMng);
     }
 }
 

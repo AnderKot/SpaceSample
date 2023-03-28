@@ -4,21 +4,15 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using SampleSpace;
 
 public class BarMng : MonoBehaviour
 {
-    public enum Statuses
-    {
-        Off = 0,
-        On = 1,
-        Alert = 3
-    }
-
     public TextMeshProUGUI TextField;
     public string Value
     {
         get { return TextField.text; }
-        set { TextField.SetText(Value); }
+        set { TextField.SetText(value); }
     }
 
     public List<Image> StatysImages;
